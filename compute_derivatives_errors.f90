@@ -1,4 +1,5 @@
-subroutine compute_derivatives_errors(nel,np,x,y,dxu_nodal, dxv_nodal, dyu_nodal, dyv_nodal, phi_nodal,icon,ibench,dxu_L1, dxu_L2, dxv_L1, dxv_L2, dyu_L1, dyu_L2, dyv_L1, dyv_L2,phi_L1,phi_L2)
+subroutine compute_derivatives_errors(nel,np,x,y,dudx_nodal, dvdx_nodal, dudy_nodal, dvdy_nodal, phi_nodal,&
+                                      icon,ibench,dudx_L1,dudx_L2,dvdx_L1,dvdx_L2,dudy_L1,dudy_L2,dvdy_L1,dvdy_L2,phi_L1,phi_L2)
 
 implicit none
 
@@ -6,25 +7,20 @@ integer, parameter :: m=4
 integer nel,np,ibench
 integer icon(4,nel)
 real(8) x(np),y(np)
-real(8) dxu_L1,dxu_L2,dxv_L1,dxv_L2,dyu_L1,dyu_L2,dyv_L1,dyv_L2,phi_L1,phi_L2
-real(8) dxu_nodal(np),dxv_nodal(np),dyu_nodal(np),dyv_nodal(np),phi_nodal(np)
-real(8), external ::  e_xx,e_yy,e_xy,phi
-real(8) xq,yq,uq,vq,jcb(2,2)  
+real(8) dudx_L1,dudx_L2,dvdx_L1,dvdx_L2,dudy_L1,dudy_L2,dvdy_L1,dvdy_L2,phi_L1,phi_L2
+real(8) dudx_nodal(np),dvdx_nodal(np),dudy_nodal(np),dvdy_nodal(np),phi_nodal(np)
+real(8), external ::  dudxth,dvdyth,dudyth,dvdxth,phith
+real(8) xq,yq,jcb(2,2),phiq
 integer iel,k,iq,jq
-real(8) N(m),dNdx(m),dNdy(m),dNdr(m),dNds(m)
-real(8) rq,sq,wq,vthq,uthq,pthq,pq,jcob
+real(8) N(m),dNdr(m),dNds(m)
+real(8) rq,sq,wq,jcob
 real(8) dudxq,dvdxq,dudyq,dvdyq
 
-dxu_L1=0
-dxu_L2=0
-dxv_L1=0
-dxv_L2=0
-dyu_L1=0
-dyu_L2=0
-dyv_L1=0
-dyv_L2=0
-phi_L1=0
-phi_L2=0
+dudx_L1=0 ; dudx_L2=0
+dvdx_L1=0 ; dvdx_L2=0
+dudy_L1=0 ; dudy_L2=0
+dvdy_L1=0 ; dvdy_L2=0
+phi_L1=0  ; phi_L2=0
 
 do iel=1,nel
 
@@ -55,45 +51,47 @@ do iel=1,nel
 
       jcob=jcb(1,1)*jcb(2,2)-jcb(2,1)*jcb(1,2)
 
-      xq=0
-      yq=0
-      dudxq=0
-      dudyq=0
-      dvdxq=0
-      dvdyq=0
+      xq=0.d0
+      yq=0.d0
+      dudxq=0.d0
+      dudyq=0.d0
+      dvdxq=0.d0
+      dvdyq=0.d0
+      phiq=0.d0
       do k=1,m
          xq=xq+N(k)*x(icon(k,iel))
          yq=yq+N(k)*y(icon(k,iel))
-         dudxq=dudxq+N(k)*dxu_nodal(icon(k,iel))
-         dudyq=dudyq+N(k)*dyu_nodal(icon(k,iel))
-         dvdxq=dvdxq+N(k)*dxv_nodal(icon(k,iel))
-         dvdyq=dvdyq+N(k)*dyv_nodal(icon(k,iel))
+         phiq=phiq+N(k)*phi_nodal(icon(k,iel))
+         dudxq=dudxq+N(k)*dudx_nodal(icon(k,iel))
+         dudyq=dudyq+N(k)*dudy_nodal(icon(k,iel))
+         dvdxq=dvdxq+N(k)*dvdx_nodal(icon(k,iel))
+         dvdyq=dvdyq+N(k)*dvdy_nodal(icon(k,iel))
       end do
 
-      dxu_L1 = dxu_L1 + abs(dudxq-e_xx(xq,yq,ibench))   *jcob*wq
-      dxu_L2 = dxu_L2 +    (dudxq-e_xx(xq,yq,ibench))**2*jcob*wq
+      dudx_L1 = dudx_L1 + abs(dudxq-dudxth(xq,yq,ibench))   *jcob*wq
+      dudx_L2 = dudx_L2 +    (dudxq-dudxth(xq,yq,ibench))**2*jcob*wq
 
-      dyu_L1 = dyu_L1 + abs(dudyq-e_xy(xq,yq,ibench))   *jcob*wq
-      dyu_L2 = dyu_L2 +    (dudyq-e_xy(xq,yq,ibench))**2*jcob*wq
+      dudy_L1 = dudy_L1 + abs(dudyq-dudyth(xq,yq,ibench))   *jcob*wq
+      dudy_L2 = dudy_L2 +    (dudyq-dudyth(xq,yq,ibench))**2*jcob*wq
 
-      dxv_L1 = dxv_L1 + abs(dvdxq-e_xy(xq,yq,ibench))   *jcob*wq
-      dxv_L2 = dxv_L2 +    (dvdxq-e_xy(xq,yq,ibench))**2*jcob*wq
+      dvdx_L1 = dvdx_L1 + abs(dvdxq-dvdxth(xq,yq,ibench))   *jcob*wq
+      dvdx_L2 = dvdx_L2 +    (dvdxq-dvdxth(xq,yq,ibench))**2*jcob*wq
 
-      dyv_L1 = dyv_L1 + abs(dvdyq-e_yy(xq,yq,ibench))   *jcob*wq
-      dyv_L2 = dyv_L2 +    (dvdyq-e_yy(xq,yq,ibench))**2*jcob*wq
+      dvdy_L1 = dvdy_L1 + abs(dvdyq-dvdyth(xq,yq,ibench))   *jcob*wq
+      dvdy_L2 = dvdy_L2 +    (dvdyq-dvdyth(xq,yq,ibench))**2*jcob*wq
 
-      !phi_L1 = phi_L1 + abs(phi_nodal(i)-phi(xq,yq,ibench))*jcob*wq
-      !phi_L2 = phi_L2 + (phi_nodal(i)-phi(xq,yq,ibench))**2*jcob*wq
+      phi_L1 = phi_L1 + abs(phiq-phith(xq,yq,ibench))*jcob*wq
+      phi_L2 = phi_L2 + (phiq-phith(xq,yq,ibench))**2*jcob*wq
 
    end do
    end do
 
 end do
 
-dxu_L2 = sqrt(dxu_L2)
-dxv_L2 = sqrt(dxv_L2)
-dyu_L2 = sqrt(dyu_L2)
-dyv_L2 = sqrt(dyv_L2)
+dudx_L2 = sqrt(dudx_L2)
+dvdx_L2 = sqrt(dvdx_L2)
+dudy_L2 = sqrt(dudy_L2)
+dvdy_L2 = sqrt(dvdy_L2)
 phi_L2 = sqrt(phi_L2)
 
 end subroutine

@@ -2,7 +2,7 @@
 
 F90=gfortran 
 FLAGS= -c -O3 -ffree-line-length-none
-#FLAGS= -c -ffree-line-length-none -Wall -Wextra -Wimplicit-interface -fPIC -fmax-errors=1 -g -fcheck=all -fbacktrace -fbounds-check -ffpe-trap=
+FLAGS= -c -ffree-line-length-none -Wall -fPIC -fmax-errors=1 -g -fcheck=all -fbacktrace -fbounds-check -ffpe-trap= 
 
 OBJECTS2D =\
 blas_routines.o\
@@ -17,7 +17,7 @@ solve_linpack.o\
 inverse_icon.o\
 elemental_to_nodal.o\
 compute_derivatives_errors.o\
-simplefem_compressible.o 
+simplefem.o 
 
 .f.o:
 	$(F90) $(FLAGS) $(INCLUDE) $*.f
@@ -30,7 +30,10 @@ code:	$(OBJECTS2D)
 clean: 
 	rm -f *.o
 	rm -f *.dat
-	rm OUT/*.dat
-	rm OUT/*.vtu
+	rm -f fort.*
+	rm -f OUT/*.dat
+	rm -f OUT/*.vtu
+	rm -f simplefem
+
 
 

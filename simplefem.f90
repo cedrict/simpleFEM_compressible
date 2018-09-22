@@ -18,8 +18,6 @@ integer nely                                   ! number of elements in the y dir
 integer nel                                    ! number of elements
 integer Nfem                                   ! size of the FEM matrix 
 integer, dimension(:,:),allocatable :: icon    ! connectivity array
-integer, dimension(:,:),allocatable :: icon_inv! inverse connectivity array
-integer, dimension(:),  allocatable :: ipvt    ! work array needed by the solver 
 integer approach                               ! hel calculation method
 integer niter                                  ! number of iterations 
 integer i1,i2,i,j,k,iel,counter,iq,jq,iter     !
@@ -39,7 +37,6 @@ real(8), dimension(:),   allocatable :: Vsolmem! velocity vector
 real(8), dimension(:),   allocatable :: rhs_f  ! right hand side
 real(8), dimension(:),   allocatable :: rhs_h  ! right hand side
 real(8), dimension(:,:), allocatable :: KKK,KKKmem    ! FEM matrix
-real(8), dimension(:),   allocatable :: work   ! work array needed by the solver
 real(8), dimension(:),   allocatable :: bc_val ! array containing bc values
 real(8), dimension(:,:), allocatable :: G      ! gradient operator matrix
 real(8), dimension(:),   allocatable :: density_nodal !density for each node
@@ -70,14 +67,13 @@ real(8) Bmat(3,ndof*m)                         ! B matrix
 real(8), dimension(3,3) :: Cmat                ! C matrix
 real(8) Aref                                   !
 real(8) eps                                    !
-real(8) rcond                                  !
 real(8) offsetx,offsety                        ! coordinates of lower left corner
 real(8), external :: uth,vth,pth               ! body force and analytical solution
 real(8), external :: rho,drhodx,drhody,gx,gy   !
-real(8), external :: e_xx,e_yy,e_xy,phi        !
+real(8), external :: dudxth,dudyth,dvdxth,dvdyth,phith
 real(8) V_diff,P_diff                          !
 real(8) tol                                    !
-real(8) L2_err_u,L2_err_v,L2_err_p             !
+real(8) L2_err_u,L2_err_v,L2_err_p,L2_err_vel  !
 real(8) L1_err_u,L1_err_v,L1_err_p             !
 real(8) rhoq,drhodyq,drhodxq                   !
 real(8) hx,hy                                  !
@@ -100,12 +96,13 @@ Ly=1.d0
 !======[node number loop]======================!
 !==============================================!
 
-open(unit=888,file='OUT/errors_spacing.dat',status='replace')
-open(unit=999,file='OUT/errors_spacing_strain.dat',status='replace')
+open(unit=888,file='OUT/discretisation_errors.dat',status='replace')
+open(unit=999,file='OUT/discretisation_errors_derivatives.dat',status='replace')
 
-do nnx= 8,64,8 !16,40,4
-write(*,*) nnx 
+do nnx= 8,48,8 
 nny=nnx
+
+write(*,'(a,i4,a,i4)') 'resolution:',nnx,' X',nny 
 
 np=nnx*nny
 
@@ -189,7 +186,6 @@ allocate(G(Nfem,nel))
 allocate(Rv(Nfem))
 allocate(Rp(nel))
 allocate(density_nodal(np))
-allocate(icon_inv(m,np))
 allocate(dudx_elemental(nel))
 allocate(dvdx_elemental(nel))
 allocate(dudy_elemental(nel))
@@ -254,8 +250,6 @@ do j=1,nely
    end do
 end do
 
-call inverse_icon(icon,icon_inv,nel,np,m)
-
 open(unit=123,file='OUT/icon.dat',status='replace')
 do iel=1,nel
    write(123,'(a)') '----------------------------'
@@ -265,18 +259,6 @@ do iel=1,nel
    write(123,'(a,i8,a,2f20.10)') '  node 2 ', icon(2,iel),' at pos. ',x(icon(2,iel)),y(icon(2,iel))
    write(123,'(a,i8,a,2f20.10)') '  node 3 ', icon(3,iel),' at pos. ',x(icon(3,iel)),y(icon(3,iel))
    write(123,'(a,i8,a,2f20.10)') '  node 4 ', icon(4,iel),' at pos. ',x(icon(4,iel)),y(icon(4,iel))
-end do
-close(123)
-
-open(unit=123,file='OUT/icon_inv.dat',status='replace')
-do iel=1,np
-   write(123,'(a)') '----------------------------'
-   write(123,'(a,i4,a)') '---node #',iel,' -----------'
-   write(123,'(a)') '----------------------------'
-   write(123,'(a,i8)') '  element 1 ', icon_inv(1,iel)
-   write(123,'(a,i8)') '  element 2 ', icon_inv(2,iel)
-   write(123,'(a,i8)') '  element 3 ', icon_inv(3,iel)
-   write(123,'(a,i8)') '  element 4 ', icon_inv(4,iel)
 end do
 close(123)
 
@@ -626,10 +608,10 @@ do i=1,nelx
 end do 
 end do 
 
-call elemental_to_nodal(dudx_elemental,dudx_nodal,icon_inv,np,nel,m)
-call elemental_to_nodal(dvdx_elemental,dvdx_nodal,icon_inv,np,nel,m)
-call elemental_to_nodal(dudy_elemental,dudy_nodal,icon_inv,np,nel,m)
-call elemental_to_nodal(dvdy_elemental,dvdy_nodal,icon_inv,np,nel,m)
+call elemental_to_nodal(dudx_elemental,dudx_nodal,icon,nel,np)
+call elemental_to_nodal(dvdx_elemental,dvdx_nodal,icon,nel,np)
+call elemental_to_nodal(dudy_elemental,dudy_nodal,icon,nel,np)
+call elemental_to_nodal(dvdy_elemental,dvdy_nodal,icon,nel,np)
 
 vrms=sqrt(vrms/Lx/Ly)
 write(*,*) "Vrms = ", vrms
@@ -721,25 +703,25 @@ phi_total = sum(phi_elemental)*hx*hy
 
 write(*,*) "phi_total = ", phi_total
 
-write(*,*) 'average pressure=',sum(Psol)/nel
-
 !==============================================!
 !=====[output solution to file]================!
 !==============================================!
 
 open(unit=123,file='OUT/solution_u.dat',status='replace')
 open(unit=234,file='OUT/solution_v.dat',status='replace')
-open(unit=345,file='OUT/solution_exx.dat',status='replace')
-open(unit=456,file='OUT/solution_eyy.dat',status='replace')
+open(unit=345,file='OUT/solution_dudx.dat',status='replace')
+open(unit=456,file='OUT/solution_dvdy.dat',status='replace')
 open(unit=012,file='OUT/solution_phi_nodal.dat',status='replace')
-open(unit=987,file='OUT/solution_exy.dat',status='replace')
+open(unit=987,file='OUT/solution_dudy.dat',status='replace')
+open(unit=988,file='OUT/solution_dvdx.dat',status='replace')
 do i=1,np
-   write(123,'(5f20.10)') x(i),y(i),u(i),uth(x(i),y(i),ibench),u(i)-uth(x(i),y(i),ibench)
-   write(234,'(5f20.10)') x(i),y(i),v(i),vth(x(i),y(i),ibench),v(i)-vth(x(i),y(i),ibench)
-   write(345,'(6f20.10)') x(i),y(i),dudx_nodal(i),e_xx(x(i),y(i),ibench),dudx_nodal(i)-e_xx(x(i),y(i),ibench),dudx_nodal(i)/e_xx(x(i),y(i),ibench)
-   write(456,'(6f20.10)') x(i),y(i),dvdy_nodal(i),e_yy(x(i),y(i),ibench),dvdy_nodal(i)-e_yy(x(i),y(i),ibench),dvdy_nodal(i)/e_yy(x(i),y(i),ibench)
-   write(012,'(6f20.10)') x(i),y(i),phi_nodal(i),phi(x(i),y(i),ibench),phi_nodal(i)-phi(x(i),y(i),ibench),phi_nodal(i)/phi(x(i),y(i),ibench)
-   write(987,'(5f20.10)') x(i), y(i), dudy_nodal(i), dvdx_nodal(i), e_xy(x(i),y(i),ibench)
+   write(123,'(5f20.10)') x(i), y(i), u(i),          uth(x(i),y(i),ibench),    u(i)-uth(x(i),y(i),ibench)
+   write(234,'(5f20.10)') x(i), y(i), v(i),          vth(x(i),y(i),ibench),    v(i)-vth(x(i),y(i),ibench)
+   write(345,'(5f20.10)') x(i), y(i), dudx_nodal(i), dudxth(x(i),y(i),ibench), dudx_nodal(i)-dudxth(x(i),y(i),ibench)
+   write(456,'(5f20.10)') x(i), y(i), dvdy_nodal(i), dvdyth(x(i),y(i),ibench), dvdy_nodal(i)-dvdyth(x(i),y(i),ibench)
+   write(987,'(5f20.10)') x(i), y(i), dudy_nodal(i), dudyth(x(i),y(i),ibench), dudy_nodal(i)-dudyth(x(i),y(i),ibench)
+   write(988,'(5f20.10)') x(i), y(i), dvdx_nodal(i), dvdxth(x(i),y(i),ibench), dvdx_nodal(i)-dvdxth(x(i),y(i),ibench)
+   write(012,'(5f20.10)') x(i), y(i), phi_nodal(i),  phith(x(i),y(i),ibench),  phi_nodal(i)-phith(x(i),y(i),ibench)
 end do
 close(123)
 close(234)
@@ -747,25 +729,23 @@ close(345)
 close(456)
 close(012)
 close(987)
+close(988)
 
-open(unit=567,file='OUT/solution_exx_el.dat',status='replace')
-open(unit=678,file='OUT/solution_eyy_el.dat',status='replace')
+open(unit=567,file='OUT/solution_dudx_el.dat',status='replace')
+open(unit=678,file='OUT/solution_dudy_el.dat',status='replace')
 open(unit=789,file='OUT/solution_phi.dat',status='replace')
-open(unit=890,file='OUT/solution_phi_components.dat',status='replace')
 open(unit=123,file='OUT/solution_p.dat',status='replace')
 do i=1,nel
-   xc = 0.25*(x(icon(1,i)) + x(icon(2,i)) + x(icon(3,i)) + x(icon(4,i))) 
-   yc = 0.25*(y(icon(1,i)) + y(icon(2,i)) + y(icon(3,i)) + y(icon(4,i)))
-   write(567,'(i3,6f20.10)') i,xc,yc,dudx_elemental(i),e_xx(xc,yc,ibench),dudx_elemental(i)-e_xx(xc,yc,ibench),dudx_elemental(i)/e_xx(xc,yc,ibench)
-   write(678,'(i3,6f20.10)') i,xc,yc,dvdy_elemental(i),e_yy(xc,yc,ibench),dvdy_elemental(i)-e_yy(xc,yc,ibench),dvdy_elemental(i)/e_yy(xc,yc,ibench)
-   write(789,'(i3,6f20.10)') i,xc,yc,phi_elemental(i),phi(xc,yc,ibench),phi_elemental(i)-phi(xc,yc,ibench),phi_elemental(i)/phi(xc,yc,ibench)
-   write(890,'(i3,7f20.10)') i,xc,yc,phi_elemental(i),phi_nodal(icon(1,i)),phi_nodal(icon(2,i)),phi_nodal(icon(3,i)),phi_nodal(icon(4,i))
-   write(123,*) xc,yc,Psol(i),pth(xc,yc,ibench),Psol(i)-pth(xc,yc,ibench)
+   xc=sum(x(icon(1:4,i)))*0.25d0
+   yc=sum(y(icon(1:4,i)))*0.25d0
+   write(567,'(5f20.10)') xc, yc, dudx_elemental(i),dudxth(xc,yc,ibench), dudx_elemental(i)-dudxth(xc,yc,ibench)
+   write(678,'(5f20.10)') xc, yc, dvdy_elemental(i),dvdyth(xc,yc,ibench), dvdy_elemental(i)-dvdyth(xc,yc,ibench)
+   write(789,'(5f20.10)') xc, yc, phi_elemental(i), phith(xc,yc,ibench),  phi_elemental(i)-phith(xc,yc,ibench)
+   write(123,'(5f20.10)') xc, yc, Psol(i),          pth(xc,yc,ibench),    Psol(i)-pth(xc,yc,ibench)
 end do
 close(567)
 close(678)
 close(789)
-close(890)
 close(123)
 
 !===================================
@@ -773,7 +753,9 @@ close(123)
 
 call compute_errors(nel,np,x,y,u,v,Psol,icon,ibench,L2_err_u,L2_err_v,L2_err_p,L1_err_u,L1_err_v,L1_err_p)
 
-write(888,*) hx,L2_err_u,L2_err_v,L2_err_p,&
+L2_err_vel=sqrt(L2_err_u**2 + L2_err_v**2)
+
+write(888,*) hx,L2_err_vel,L2_err_p,&
                 L1_err_u,L1_err_v,L1_err_p ; call flush(888)
 
 call compute_derivatives_errors(nel,np,x,y,dudx_nodal,dvdx_nodal,dudy_nodal,dvdy_nodal,phi_nodal,&
@@ -787,7 +769,7 @@ write(999,'(11es16.5)') hx,dudx_L1,dudx_L2,dvdx_L1,dvdx_L2,&
 
 !===================================!
 
-call output_for_paraview (np,nel,x,y,u,v,Psol,icon,ibench,phi_nodal,density_nodal,Rv,Rp)
+call output_for_paraview (np,nel,x,y,u,v,Psol,icon,ibench,phi_nodal,density_nodal,Rv,Rp,dudx_nodal,dvdy_nodal)
 
 !===================================!
 !===========deallocate memory=======!
@@ -812,7 +794,6 @@ deallocate(G)
 deallocate(Rv)
 deallocate(Rp)
 deallocate(density_nodal)
-deallocate(icon_inv)
 deallocate(dudx_elemental)
 deallocate(dvdx_elemental)
 deallocate(dudy_elemental)

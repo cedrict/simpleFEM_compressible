@@ -9,7 +9,7 @@ real(8), dimension(Nfem) :: Vsol,rhs_f,Vsolmem
 real(8), dimension(nel) :: Psol,Psolmem
 real(8), dimension(nel) :: rhs_h,q,d,qkp1,dkp1
 
-real(8), dimension(Nfem) :: B,Rv,h,phi
+real(8), dimension(Nfem) :: B,h,phi
 
 real(8), dimension(:),   allocatable :: work   ! work array needed by the solver
 integer, dimension(:), allocatable :: ipvt     ! work array needed by the solver 
