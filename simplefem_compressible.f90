@@ -24,7 +24,7 @@ integer approach                               ! hel calculation method
 integer niter                                  ! number of iterations 
 integer i1,i2,i,j,k,iel,counter,iq,jq,iter     !
 integer ik,jk,ikk,jkk,m1,m2,k1,k2              !
-integer ibench,solver                          !
+integer ibench,solver,ibench_loop              !
                                                !  
 real(8) Lx,Ly                                  ! size of the numerical domain
 real(8) viscosity                              ! dynamic viscosity $\mu$ of the material
@@ -88,6 +88,10 @@ real(8) dudx_L1,dudx_L2,dvdx_L1,dvdx_L2,dudy_L1!
 real(8) dudy_L2,dvdy_L1,dvdy_L2,phi_L1,phi_L2  !
                                                !
 logical, dimension(:), allocatable :: bc_fix   ! prescribed b.c. array
+character(len=1) cbench                        ! benchmark as a string for filenames
+real(8),dimension(4) :: benchmark_list         ! list of benchmarks to loop over
+character(len=2) c_nnx                         ! character form of nnx
+
                                                !
 !==============================================!
 !=====[setup]==================================!
@@ -97,13 +101,29 @@ Lx=1.d0
 Ly=1.d0
 
 !==============================================!
+!========[benchmark loop]======================!
+!==============================================!
+
+
+benchmark_list = [1,2,3,5]
+
+do ibench_loop=1,4
+ibench=benchmark_list(ibench_loop)
+
+write(*,*) "Now running benchmark ", ibench
+call int_to_char(cbench,1,ibench_loop)
+
+!==============================================!
 !======[node number loop]======================!
 !==============================================!
 
-open(unit=888,file='OUT/errors_spacing.dat',status='replace')
-open(unit=999,file='OUT/errors_spacing_strain.dat',status='replace')
 
-do nnx= 8,64,8 !16,40,4
+open(unit=888,file='OUT/errors_spacing_'//cbench//'.dat',status='replace')
+open(unit=999,file='OUT/errors_spacing_strain_'//cbench//'.dat',status='replace')
+
+
+do nnx= 8,32,8 !16,40,4
+call int_to_char(c_nnx,2,nnx)
 write(*,*) nnx 
 nny=nnx
 
@@ -132,7 +152,6 @@ Cmat(3,1)=0.d0       ; Cmat(3,2)=0.d0       ; Cmat(3,3)=1.d0
 ! 4 - Arie van den Berg
 ! 5 - 1D Cartesian Sinusoidal
 
-ibench=1
 select case(ibench)
 case(-1)
 offsetx=0.d0
@@ -164,7 +183,7 @@ solver=2
 approach=2
 
 if (ibench<0) approach=1 ! kill hel :)
-if (ibench<0) niter=1 ! kill hel :)
+if (ibench<0) niter=1 ! no iteration needed for incompressible
 
 !==============================================!
 !===[allocate memory]==========================!
@@ -787,7 +806,7 @@ write(999,'(11es16.5)') hx,dudx_L1,dudx_L2,dvdx_L1,dvdx_L2,&
 
 !===================================!
 
-call output_for_paraview (np,nel,x,y,u,v,Psol,icon,ibench,phi_nodal,density_nodal,Rv,Rp)
+call output_for_paraview (np,nel,x,y,u,v,Psol,icon,ibench,phi_nodal,density_nodal,Rv,Rp,cbench,c_nnx)
 
 !===================================!
 !===========deallocate memory=======!
@@ -828,6 +847,8 @@ end do !end number of nodes loop
 
 close(888)
 close(999)
+
+end do !end benchmark loop
 
 end program
 

@@ -13,7 +13,7 @@ real(8) xq,yq,uq,vq,jcb(2,2)
 integer iel,k,iq,jq
 real(8) N(m),dNdx(m),dNdy(m),dNdr(m),dNds(m)
 real(8) rq,sq,wq,vthq,uthq,pthq,pq,jcob
-real(8) dudxq,dvdxq,dudyq,dvdyq
+real(8) dudxq,dvdxq,dudyq,dvdyq,phiq
 
 dxu_L1=0
 dxu_L2=0
@@ -61,6 +61,7 @@ do iel=1,nel
       dudyq=0
       dvdxq=0
       dvdyq=0
+      phiq =0
       do k=1,m
          xq=xq+N(k)*x(icon(k,iel))
          yq=yq+N(k)*y(icon(k,iel))
@@ -68,6 +69,7 @@ do iel=1,nel
          dudyq=dudyq+N(k)*dyu_nodal(icon(k,iel))
          dvdxq=dvdxq+N(k)*dxv_nodal(icon(k,iel))
          dvdyq=dvdyq+N(k)*dyv_nodal(icon(k,iel))
+         phiq =phiq +N(k)*phi_nodal(icon(k,iel))
       end do
 
       dxu_L1 = dxu_L1 + abs(dudxq-e_xx(xq,yq,ibench))   *jcob*wq
@@ -82,8 +84,8 @@ do iel=1,nel
       dyv_L1 = dyv_L1 + abs(dvdyq-e_yy(xq,yq,ibench))   *jcob*wq
       dyv_L2 = dyv_L2 +    (dvdyq-e_yy(xq,yq,ibench))**2*jcob*wq
 
-      !phi_L1 = phi_L1 + abs(phi_nodal(i)-phi(xq,yq,ibench))*jcob*wq
-      !phi_L2 = phi_L2 + (phi_nodal(i)-phi(xq,yq,ibench))**2*jcob*wq
+      phi_L1 = phi_L1 + abs(phiq - phi(xq,yq,ibench))   *jcob*wq
+      phi_L2 = phi_L2 +    (phiq - phi(xq,yq,ibench))**2*jcob*wq
 
    end do
    end do

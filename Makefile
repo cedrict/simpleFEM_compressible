@@ -17,6 +17,7 @@ solve_linpack.o\
 inverse_icon.o\
 elemental_to_nodal.o\
 compute_derivatives_errors.o\
+int_to_char.o\
 simplefem_compressible.o 
 
 .f.o:

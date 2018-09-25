@@ -1,0 +1,139 @@
+
+import numpy as np
+import matplotlib.pyplot as plt 
+import io
+
+
+data1=np.loadtxt("OUT/errors_spacing_1.dat")
+u1L2 = data1[:,1]
+v1L2 = data1[:,2]
+p1L2 = data1[:,3]
+u1L1 = np.abs(data1[:,4])
+v1L1 = np.abs(data1[:,5])
+p1L1 = np.abs(data1[:,6])
+
+uv1L1 = np.sqrt(u1L1**2+v1L1**2)
+uv1L2 = np.sqrt(u1L2**2+v1L2**2)
+
+
+data2=np.loadtxt("OUT/errors_spacing_2.dat")
+u2L2 = data2[:,1]
+v2L2 = data2[:,2]
+p2L2 = data2[:,3]
+u2L1 = np.abs(data2[:,4])
+v2L1 = np.abs(data2[:,5])
+p2L1 = np.abs(data2[:,6])
+
+uv2L1 = np.sqrt(u2L1**2+v2L1**2)
+uv2L2 = np.sqrt(u2L2**2+v2L2**2)
+
+
+
+data3=np.loadtxt("OUT/errors_spacing_3.dat")
+u3L2 = data3[:,1]
+v3L2 = data3[:,2]
+p3L2 = data3[:,3]
+u3L1 = np.abs(data3[:,4])
+v3L1 = np.abs(data3[:,5])
+p3L1 = np.abs(data3[:,6])
+
+uv3L1 = np.sqrt(u3L1**2+v3L1**2)
+uv3L2 = np.sqrt(u3L2**2+v3L2**2)
+
+
+
+data5=np.loadtxt("OUT/errors_spacing_4.dat")
+u5L2 = data5[:,1]
+v5L2 = data5[:,2]
+p5L2 = data5[:,3]
+u5L1 = np.abs(data5[:,4])
+v5L1 = np.abs(data5[:,5])
+p5L1 = np.abs(data5[:,6])
+
+uv5L1 = np.sqrt(u5L1**2+v5L1**2)
+uv5L2 = np.sqrt(u5L2**2+v5L2**2)
+
+
+
+nnx = data1[:,0]
+h=1/nnx
+
+
+
+
+
+r_u1=['r_{u1}']
+r_u1.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(u1L1))[0][0]))
+r_u1.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(u2L1))[0][0]))
+r_u1.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(u3L1))[0][0]))
+r_u1.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(u5L1))[0][0]))
+
+
+r_u2=['r_{u2}']
+r_u2.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(u1L2))[0][0]))
+r_u2.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(u2L2))[0][0]))
+r_u2.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(u3L2))[0][0]))
+r_u2.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(u5L2))[0][0]))
+
+
+r_v1=['r_{v1}']
+r_v1.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(v1L1))[0][0]))
+r_v1.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(v2L1))[0][0]))
+r_v1.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(v3L1))[0][0]))
+r_v1.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(v5L1))[0][0]))
+
+
+r_v2=['r_{v1}']
+r_v2.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(v1L2))[0][0]))
+r_v2.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(v2L2))[0][0]))
+r_v2.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(v3L2))[0][0]))
+r_v2.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(v5L2))[0][0]))
+r_v2
+
+
+
+r_p1=['r_{p1}']
+r_p1.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(p1L1))[0][0]))
+r_p1.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(p2L1))[0][0]))
+r_p1.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(p3L1))[0][0]))
+r_p1.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(p5L1))[0][0]))
+
+
+
+r_p2=['r_{p2}']
+r_p2.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(p1L2))[0][0]))
+r_p2.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(p2L2))[0][0]))
+r_p2.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(p3L2))[0][0]))
+r_p2.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(p5L2))[0][0]))
+
+
+r_uv1=['r_{uv1}']
+r_uv1.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(uv1L1))[0][0]))
+r_uv1.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(uv2L1))[0][0]))
+r_uv1.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(uv3L1))[0][0]))
+r_uv1.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(uv5L1))[0][0]))
+
+
+r_uv2=['r_{uv2}']
+r_uv2.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(uv1L2))[0][0]))
+r_uv2.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(uv2L2))[0][0]))
+r_uv2.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(uv3L2))[0][0]))
+r_uv2.append(str(-np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(uv5L2))[0][0]))
+
+ratesArray=[r_u1,r_u2,r_v1,r_v2,r_p1,r_p2,r_uv1,r_uv2]
+
+file=io.open("convergence_rates.txt",'w')
+file.write('\\begin{tabular}{| l | c c c c |} \n \hline \n')
+file.write(' & Benchmark 1 & Benchmark 2 & Benchmark 3 & Benchmark 5 \\\ \hline \n')
+for sublist in ratesArray:
+    for i in range(len(sublist)):
+        if (i==0):
+            file.write('$' + sublist[i] + '$')
+        else:
+            file.write(sublist[i])
+        if(i < len(sublist)-1):
+            file.write(" & ")
+    file.write(' \\\ \hline \n')
+file.write(' \n \end{tabular}')
+file.close()
+
