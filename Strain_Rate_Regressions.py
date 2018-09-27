@@ -74,6 +74,8 @@ dyv_list_1 = [dyv_L1_1,dyv_L1_2,dyv_L1_3,dyv_L1_5]
 dyv_list_2 = [dyv_L2_1,dyv_L2_2,dyv_L2_3,dyv_L2_5]
 dxv_list_1 = [dxv_L1_1,dxv_L1_2,dxv_L1_3,dxv_L1_5]
 dxv_list_2 = [dxv_L2_1,dxv_L2_2,dxv_L2_3,dxv_L2_5]
+dyu_list_1 = [dyu_L1_1,dyu_L1_2,dyu_L1_3,dyu_L1_5]
+dyu_list_2 = [dyu_L2_1,dyu_L2_2,dyu_L2_3,dyu_L2_5]
 phi_list_1 = [phi_L1_1,phi_L1_2,phi_L1_3,phi_L1_5]
 phi_list_2 = [phi_L2_1,phi_L2_2,phi_L2_3,phi_L2_5]
 
@@ -126,11 +128,16 @@ for phi in phi_list_2:
     phi_regression_list_2.append(get_regression(x,phi))
 
 ratesArray=[]
-ratesArray.append(dxu_regression_list_1,dxu_regression_list_1)
-ratesArray.append(dyu_regression_list_1,dyu_regression_list_1)
-ratesArray.append(dyv_regression_list_1,dyv_regression_list_1)
-ratesArray.append(dxv_regression_list_1,dxv_regression_list_1)
-ratesArray.append(phi_regression_list_1,phi_regression_list_1)
+ratesArray.append(dxu_regression_list_1)
+ratesArray.append(dxu_regression_list_1)
+ratesArray.append(dyu_regression_list_1)
+ratesArray.append(dyu_regression_list_1)
+ratesArray.append(dyv_regression_list_1)
+ratesArray.append(dyv_regression_list_1)
+ratesArray.append(dxv_regression_list_1)
+ratesArray.append(dxv_regression_list_1)
+ratesArray.append(phi_regression_list_1)
+ratesArray.append(phi_regression_list_1)
 
 
 file=io.open("convergence_rates_strain.txt",'w')
@@ -139,9 +146,9 @@ file.write(' & Benchmark 1 & Benchmark 2 & Benchmark 3 & Benchmark 5 \\\ \hline 
 for sublist in ratesArray:
     for i in range(len(sublist)):
         if (i==0):
-            file.write('$' + sublist[i] + '$')
+            file.write('$' + str(sublist[i]) + '$')
         else:
-            file.write(sublist[i])
+            file.write(str(sublist[i]))
         if(i < len(sublist)-1):
             file.write(" & ")
     file.write(' \\\ \hline \n')

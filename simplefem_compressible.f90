@@ -122,7 +122,7 @@ open(unit=888,file='OUT/errors_spacing_'//cbench//'.dat',status='replace')
 open(unit=999,file='OUT/errors_spacing_strain_'//cbench//'.dat',status='replace')
 
 
-do nnx= 8,32,8 !16,40,4
+do nnx= 8,64,8 !16,40,4
 call int_to_char(c_nnx,2,nnx)
 write(*,*) nnx 
 nny=nnx
@@ -701,39 +701,11 @@ do iel=1,nel
       jcbi(2,2)=    jcb(1,1) /jcob
 
       do k=1,m
-         dNdx(k)=jcbi(1,1)*dNdr(k)+jcbi(1,2)*dNds(k)
-         dNdy(k)=jcbi(2,1)*dNdr(k)+jcbi(2,2)*dNds(k)
-      end do
-
-      ! v_el=0.d0
-      ! T_el=0.d0
-      do k=1,m
-
-         ! phi = phi + viscosity*(dudx_nodal(icon(k,iel))**2 + dudx_nodal(icon(k,iel))*(dudx_nodal(icon(k,iel)) + dvdy_nodal(icon(k,iel))))!i=x,j=x
-         ! phi = phi + viscosity*(dvdy_nodal(icon(k,iel))**2 + dvdy_nodal(icon(k,iel))*(dudx_nodal(icon(k,iel)) + dvdy_nodal(icon(k,iel))))!i=y,j=y
-         ! phi = phi + viscosity*0.5*(dvdx_nodal(icon(k,iel))**2 + dvdx_nodal(icon(k,iel))*dudy_nodal(icon(k,iel)))
-         ! phi = phi + viscosity*0.5*(dudy_nodal(icon(k,iel))**2 + dvdx_nodal(icon(k,iel))*dudy_nodal(icon(k,iel)))
-
-         ! phi_elemental(iel) = phi_elemental(iel) + viscosity*(2.d0*dudx_nodal(icon(k,iel)))**2
-         ! phi_elemental(iel) = phi_elemental(iel) + viscosity*2.d0*(dvdx_nodal(icon(k,iel)) + dudy_nodal(icon(k,iel)))**2
-         ! phi_elemental(iel) = phi_elemental(iel) + viscosity*(2.d0*dvdy_nodal(icon(k,iel)))**2
-         ! phi_elemental(iel) = phi_elemental(iel) - viscosity*4.d0/3.d0*(dudx_nodal(icon(k,iel))+dvdy_nodal(icon(k,iel)))**2
-
-         ! phi_elemental(iel) = phi_elemental(iel) + viscosity*4.d0/3.d0*dNdx(k)*u(icon(k,iel))*dNdx(k)*u(icon(k,iel))
-         ! phi_elemental(iel) = phi_elemental(iel) + viscosity*4.d0/3.d0*dNdy(k)*v(icon(k,iel))*dNdy(k)*v(icon(k,iel))
-         ! phi_elemental(iel) = phi_elemental(iel) - viscosity*(dNdx(k)*v(icon(k,iel)) + dNdy(k)*u(icon(k,iel)))**2
-         ! phi_elemental(iel) = phi_elemental(iel) - viscosity*4.d0/3.d0*dNdx(k)*u(icon(k,iel))*dNdy(k)*v(icon(k,iel))
-
-          !phi_elemental(iel) = phi_elemental(iel)*N(k)*wq*jcob
-
-         ! v_el = v_el + v(icon(k,iel))*N(k)
-         ! T_el = t_el + T(icon(k,iel))*N(k)
-
          phi_elemental(iel) = phi_elemental(iel) + N(k)*phi_nodal(icon(k,iel))*wq*jcob/(hx*hy)
       end do
    end do
    end do
-   !phi_elemental(iel) = 0.25*(phi_nodal(icon(1,iel)) + phi_nodal(icon(2,iel)) + phi_nodal(icon(3,iel)) + phi_nodal(icon(4,iel)))
+
 end do
    
 phi_total = sum(phi_elemental)*hx*hy
