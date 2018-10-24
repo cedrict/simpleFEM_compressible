@@ -743,11 +743,29 @@ close(123)
 !===================================
 !compute L2 norms 
 
+! call compute_errors(nel,np,x,y,u,v,Psol,icon,ibench,L2_err_u,L2_err_v,L2_err_p,L1_err_u,L1_err_v,L1_err_p)
+
+! L2_err_vel=sqrt(L2_err_u**2 + L2_err_v**2)
+
+! write(888,*) hx,L2_err_vel,L2_err_p,&
+!                 L1_err_u,L1_err_v,L1_err_p ; call flush(888)
+
+! call compute_derivatives_errors(nel,np,x,y,dudx_nodal,dvdx_nodal,dudy_nodal,dvdy_nodal,phi_nodal,&
+!                                 icon,ibench,&
+!                                 dudx_L1,dudx_L2,dvdx_L1,dvdx_L2,dudy_L1,dudy_L2,dvdy_L1,dvdy_L2,&
+!                                 phi_L1,phi_L2)
+
+! write(999,'(11es16.5)') hx,dudx_L1,dudx_L2,dvdx_L1,dvdx_L2,&
+!                 dudy_L1,dudy_L2,dvdy_L1,dvdy_L2,&
+!                 phi_L1,phi_L2 ; call flush(999)
+
+
+!===================================
+!compute L2 norms 
+
 call compute_errors(nel,np,x,y,u,v,Psol,icon,ibench,L2_err_u,L2_err_v,L2_err_p,L1_err_u,L1_err_v,L1_err_p)
 
-L2_err_vel=sqrt(L2_err_u**2 + L2_err_v**2)
-
-write(888,*) hx,L2_err_vel,L2_err_p,&
+write(888,*) hx,L2_err_u,L2_err_v,L2_err_p,&
                 L1_err_u,L1_err_v,L1_err_p ; call flush(888)
 
 call compute_derivatives_errors(nel,np,x,y,dudx_nodal,dvdx_nodal,dudy_nodal,dvdy_nodal,phi_nodal,&
@@ -758,6 +776,8 @@ call compute_derivatives_errors(nel,np,x,y,dudx_nodal,dvdx_nodal,dudy_nodal,dvdy
 write(999,'(11es16.5)') hx,dudx_L1,dudx_L2,dvdx_L1,dvdx_L2,&
                 dudy_L1,dudy_L2,dvdy_L1,dvdy_L2,&
                 phi_L1,phi_L2 ; call flush(999)
+
+!===================================!
 
 !===================================!
 

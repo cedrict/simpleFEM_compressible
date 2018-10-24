@@ -15,10 +15,11 @@ def clean_data(data,nnx_minimum):
             data = np.delete(data,0,0)
         else:
             break
-
+nnx_minimum=0
 
 data1=np.loadtxt("OUT/errors_spacing_1.dat")
-clean_data(data1,32)
+print(data1)
+clean_data(data1,nnx_minimum)
 u1L2 = data1[:,1]
 v1L2 = data1[:,2]
 p1L2 = data1[:,3]
@@ -31,7 +32,7 @@ uv1L2 = np.sqrt(u1L2**2+v1L2**2)
 
 
 data2=np.loadtxt("OUT/errors_spacing_2.dat")
-clean_data(data2,32)
+clean_data(data2,nnx_minimum)
 u2L2 = data2[:,1]
 v2L2 = data2[:,2]
 p2L2 = data2[:,3]
@@ -45,7 +46,7 @@ uv2L2 = np.sqrt(u2L2**2+v2L2**2)
 
 
 data3=np.loadtxt("OUT/errors_spacing_3.dat")
-clean_data(data3,32)
+clean_data(data3,nnx_minimum)
 u3L2 = data3[:,1]
 v3L2 = data3[:,2]
 p3L2 = data3[:,3]
@@ -59,7 +60,7 @@ uv3L2 = np.sqrt(u3L2**2+v3L2**2)
 
 
 data5=np.loadtxt("OUT/errors_spacing_4.dat")
-clean_data(data5,32)
+clean_data(data5,nnx_minimum)
 u5L2 = data5[:,1]
 v5L2 = data5[:,2]
 p5L2 = data5[:,3]
