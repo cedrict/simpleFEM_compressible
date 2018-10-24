@@ -1,7 +1,7 @@
-subroutine output_for_paraview (np,nel,x,y,Vx,Vy,p,icon,ibench,phi_nodal,density,Rv,Rp,cbench,c_nnx)
+subroutine output_for_paraview (np,nel,x,y,Vx,Vy,p,icon,ibench,phi,density,Rv,Rp,dudx_nodal,dvdy_nodal,cbench,c_nnx)
 implicit none
 integer np,nel
-real(8), dimension(np)    :: x,y,Vx,Vy,mueff,phi_nodal,density
+real(8), dimension(np)    :: x,y,Vx,Vy,phi,density,dudx_nodal,dvdy_nodal
 real(8), dimension(nel)   :: p,Rp
 integer, dimension(4,nel) :: icon
 real(8), dimension(2*np)  :: Rv 
@@ -11,8 +11,9 @@ integer i,iel
 character(len=1) cbench
 character(len=2) c_nnx
 
-real(8), external :: uth,vth,pth,phi
+real(8), external :: uth,vth,pth,phith
 real(8), external :: rho,drhodx,drhody,gx,gy  
+real(8), external :: dudxth,dvdyth
 !=======================================
 
 open(unit=123,file='OUT/visu_Benchmark_'//cbench//'nnx_'//c_nnx//'.vtu',status='replace',form='formatted')
@@ -42,19 +43,19 @@ write(123,*) '</DataArray>'
 
 write(123,*) '<DataArray type="Float32" Name="phi" Format="ascii">'
 do i=1,np
-write(123,*) phi_nodal(i)
+write(123,*) phi(i)
 end do
 write(123,*) '</DataArray>'
 
 write(123,*) '<DataArray type="Float32" Name="phi(analytical)" Format="ascii">'
 do i=1,np
-write(123,*) phi(x(i),y(i),ibench)
+write(123,*) phith(x(i),y(i),ibench)
 end do
 write(123,*) '</DataArray>'
 
 write(123,*) '<DataArray type="Float32" Name="phi differences" Format="ascii">'
 do i=1,np
-write(123,*) phi_nodal(i)-phi(x(i),y(i),ibench)
+write(123,*) phi(i)-phith(x(i),y(i),ibench)
 end do
 write(123,*) '</DataArray>'
 
@@ -64,6 +65,19 @@ do i=1,np
 write(123,*) density(i)
 end do
 write(123,*) '</DataArray>'
+
+write(123,*) '<DataArray type="Float32" Name="dudx (nodal)" Format="ascii">'
+do i=1,np
+write(123,*) dudx_nodal(i)
+end do
+write(123,*) '</DataArray>'
+
+write(123,*) '<DataArray type="Float32" Name="dvdy (nodal)" Format="ascii">'
+do i=1,np
+write(123,*) dvdy_nodal(i)
+end do
+write(123,*) '</DataArray>'
+
 
 write(123,*) '<DataArray type="Float32" NumberOfComponents="3" Name="velocity(analytical)" Format="ascii">'
 do i=1,np
@@ -76,7 +90,6 @@ do i=1,np
 write(123,*) Vx(i)-uth(x(i),y(i),ibench),Vy(i)-vth(x(i),y(i),ibench),0. 
 end do
 write(123,*) '</DataArray>'
-
 
 !write(123,*) '<DataArray type="Float32" Name="mueff (nodal)" Format="ascii">'
 !do i=1,np
@@ -106,7 +119,6 @@ write(123,*) Rp(iel)
 end do
 write(123,*) '</DataArray>'
 
-
 write(123,*) '<DataArray type="Float32" Name="pressure(analytical)" Format="ascii">'
 do iel=1,nel
 xc=sum(x(icon(:,iel)))*0.25d0
@@ -122,6 +134,28 @@ yc=sum(y(icon(:,iel)))*0.25d0
 write(123,*) p(iel)-pth(xc,yc,ibench)
 end do
 write(123,*) '</DataArray>'
+
+write(123,*) '<DataArray type="Float32" Name="dudx (elemental)" Format="ascii">'
+do iel=1,nel
+xc=sum(x(icon(:,iel)))*0.25d0
+yc=sum(y(icon(:,iel)))*0.25d0
+write(123,*) dudxth(xc,yc,ibench)
+end do
+write(123,*) '</DataArray>'
+
+write(123,*) '<DataArray type="Float32" Name="dvdy (elemental)" Format="ascii">'
+do iel=1,nel
+xc=sum(x(icon(:,iel)))*0.25d0
+yc=sum(y(icon(:,iel)))*0.25d0
+write(123,*) dvdyth(xc,yc,ibench)
+end do
+write(123,*) '</DataArray>'
+
+
+
+
+
+
 
 write(123,*) '</CellData>'
 !.............................

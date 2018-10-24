@@ -8,7 +8,7 @@ real(8), dimension(Nfem) :: Vsol,rhs_f,Vsolmem
 real(8), dimension(nel) :: Psol,Psolmem
 real(8), dimension(nel) :: rhs_h,q
 
-real(8), dimension(Nfem) :: B,Rv,h,phi
+real(8), dimension(Nfem) :: B,h,phi
 !real(8), dimension(Nfem,1) :: GP
 
 real(8), dimension(:),   allocatable :: work   ! work array needed by the solver

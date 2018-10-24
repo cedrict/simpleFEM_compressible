@@ -9,7 +9,7 @@ real(8) xq,yq,uq,vq,jcb(2,2)
 real(8) L2_err_u,L2_err_v,L2_err_p
 real(8) L1_err_u,L1_err_v,L1_err_p
 real(8) rq,sq,wq,vthq,uthq,pthq,pq,jcob
-real(8) N(m),dNdx(m),dNdy(m),dNdr(m),dNds(m) 
+real(8) N(m),dNdr(m),dNds(m) 
 real(8), external :: uth,vth,pth  
 
 !==============================================!

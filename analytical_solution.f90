@@ -1,8 +1,4 @@
-
-!pth = -(1.d0/x**2+1.d0/y**2)-x*y
-
-
-
+!-----------------------------------
 !Cases
 !-1 - original incompressible bench
 !1 - 2D Cartesian Linear
@@ -10,14 +6,12 @@
 !3 - 1D Cartesian Linear
 !4 - Arie van den Berg
 !5 - 1D Cartesian Sinusoidal
-
+!-----------------------------------
 
 function uth (x,y,ibench)
 implicit none
-real(8) uth,x,y,r,phi
+real(8) uth,x,y
 integer ibench
-r=sqrt(x**2+y**2)
-phi = atan(y/x)
 select case(ibench)
 case(-1)
 uth = x**2 * (1.d0-x)**2 * (2.d0*y - 6.d0*y**2 + 4*y**3)
@@ -34,9 +28,11 @@ uth = 1.d0/cos(x)
 end select
 end function
 
+!-----------------------------------
+
 function vth (x,y,ibench)
 implicit none
-real(8) vth,x,y,r,phi
+real(8) vth,x,y
 integer ibench
 select case(ibench)
 case(-1)
@@ -51,13 +47,14 @@ case(4)
 vth=0.d0
 case(5)
 vth=0.d0
-
 end select
 end function
 
+!-----------------------------------
+
 function pth (x,y,ibench)
 implicit none
-real(8) pth,x,y,r,phi
+real(8) pth,x,y
 integer ibench
 select case(ibench)
 case(-1)
@@ -77,12 +74,13 @@ case(5)
 !pth = sin(x)/cos(x)**2-sin(x) - 0.391118
 pth = 4.d0*sin(x)/(3.d0*cos(x)**2) - sin(x) -0.674723
 end select
-
 end function
+
+!-----------------------------------
 
 function rho(x,y,ibench)
 implicit none
-real(8) rho,x,y,r,phi
+real(8) rho,x,y
 integer ibench
 select case(ibench)
 case(-1)
@@ -100,9 +98,11 @@ rho=cos(x)
 end select
 end function
 
+!-----------------------------------
+
 function drhodx(x,y,ibench)
 implicit none
-real(8) drhodx,x,y,r,phi
+real(8) drhodx,x,y
 integer ibench
 select case(ibench)
 case(-1)
@@ -120,10 +120,11 @@ drhodx=-sin(x)
 end select
 end function
 
+!-----------------------------------
 
 function drhody(x,y,ibench)
 implicit none
-real(8) drhody,x,y,r,phi
+real(8) drhody,x,y
 integer ibench
 select case(ibench)
 case(-1)
@@ -140,6 +141,8 @@ case(5)
 drhody=0.d0
 end select
 end function
+
+!-----------------------------------
 
 function gx(x,y,ibench)
 implicit none
@@ -162,6 +165,8 @@ gx=-1.d0
 end select
 end function
 
+!-----------------------------------
+
 function gy(x,y,ibench)
 implicit none
 real(8) gy,x,y
@@ -183,79 +188,105 @@ gy=0.d0
 end select
 end function
 
-function e_xx(x,y,ibench)
+!-----------------------------------
+
+function dudxth(x,y,ibench)
 implicit none
-real(8) e_xx,x,y
+real(8) dudxth,x,y
 integer ibench
 select case(ibench)
-	case(1)
-		e_xx=-1.d0/x**2
-	case(2)
-		e_xx= sin(x)/cos(x)**2
-	case(3)
-		e_xx = -1.d0/x**2
-	case(4)
-
-	case(5)
-	e_xx = sin(x)/(cos(x)**2)
-	end select
+case(1)
+dudxth=-1.d0/x**2
+case(2)
+dudxth= sin(x)/cos(x)**2
+case(3)
+dudxth = -1.d0/x**2
+case(4)
+dudxth=0.d0
+case(5)
+dudxth = sin(x)/(cos(x)**2)
+end select
 end function
 
-function e_yy(x,y,ibench)
+!-----------------------------------
+
+function dvdyth(x,y,ibench)
 implicit none
-real(8) e_yy,x,y
+real(8) dvdyth,x,y
 integer ibench
 select case(ibench)
-	case(1)
-		e_yy=-1.d0/y**2
-	case(2)
-		e_yy=sin(y)/cos(y)**2
-	case(3)
-		e_yy=0.d0
-	case(4)
-
-	case(5)
-	e_yy=0.d0
-	end select
+case(1)
+dvdyth=-1.d0/y**2
+case(2)
+dvdyth=sin(y)/cos(y)**2
+case(3)
+dvdyth=0.d0
+case(4)
+dvdyth=0.d0
+case(5)
+dvdyth=0.d0
+end select
 end function
 
+!-----------------------------------
 
-
-function phi(x,y,ibench)
-	implicit none
-	real(8) phi,x,y
-	integer ibench
-	select case(ibench)
-	case(1)
-		phi = -(1.d0/(y**2))*(-4.d0/(3.d0*y**2) + 2.d0/(3.d0*x**2)) -(1.d0/(x**2))*(-4.d0/(3.d0*x**2) + 2.d0/(3.d0*y**2))  
-		! phi = 4.d0/(3.d0*x**4)
-	case(2)
-		phi = sin(y)/cos(y)**2*(-2.d0*sin(x)/(3.d0*cos(x)**2)+4*sin(y)/(3*cos(y)**2)) + sin(x)/cos(x)**2*(-2.d0*sin(y)/(3.d0*cos(y)**2)+4*sin(x)/(3*cos(x)**2))
-
-	case(3)
-		phi = 4.d0/(3.d0*x**4)
-	case(4)
-
-	case(5)
-		phi = 4.d0*sin(x)**2/(3.d0*cos(x)**4)
-	end select
+function phith(x,y,ibench)
+implicit none
+real(8) phith,x,y
+integer ibench
+select case(ibench)
+case(1)
+phith = -(1.d0/(y**2))*(-4.d0/(3.d0*y**2) + 2.d0/(3.d0*x**2))&
+        -(1.d0/(x**2))*(-4.d0/(3.d0*x**2) + 2.d0/(3.d0*y**2))  
+! phi = 4.d0/(3.d0*x**4)
+case(2)
+phith = sin(y)/cos(y)**2*(-2.d0*sin(x)/(3.d0*cos(x)**2)+4*sin(y)/(3*cos(y)**2)) &
+      + sin(x)/cos(x)**2*(-2.d0*sin(y)/(3.d0*cos(y)**2)+4*sin(x)/(3*cos(x)**2))
+case(3)
+phith = 4.d0/(3.d0*x**4)
+case(4)
+phith=0
+case(5)
+phith = 4.d0*sin(x)**2/(3.d0*cos(x)**4)
+end select
 end function
 
+!-----------------------------------
 
-function e_xy(x,y,ibench)
-	implicit none
-	real(8) e_xy,x,y
-	integer ibench
-	select case(ibench)
-	case(1)
-		e_xy=0.d0
-	case(2)
-		e_xy=0.d0
-	case(3)
-		e_xy=0.d0
-	case(4)
-
-	case(5)
-		e_xy=0.d0
-	end select
+function dudyth(x,y,ibench)
+implicit none
+real(8) dudyth,x,y
+integer ibench
+select case(ibench)
+case(1)
+dudyth=0.d0
+case(2)
+dudyth=0.d0
+case(3)
+dudyth=0.d0
+case(4)
+case(5)
+dudyth=0.d0
+end select
 end function
+
+!-----------------------------------
+
+function dvdxth(x,y,ibench)
+implicit none
+real(8) dvdxth,x,y
+integer ibench
+select case(ibench)
+case(1)
+dvdxth=0.d0
+case(2)
+dvdxth=0.d0
+case(3)
+dvdxth=0.d0
+case(4)
+case(5)
+dvdxth=0.d0
+end select
+end function
+
+!-----------------------------------

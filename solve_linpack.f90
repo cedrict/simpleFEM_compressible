@@ -3,7 +3,6 @@ subroutine solve_linpack(A,b,np)
 integer, intent(in) :: np
 real(8), dimension(np,np):: A !A matrix
 real(8), dimension(np) :: b   !b vector
-real(8), dimension(np) :: x         !x output vector
 real(8), dimension(:),allocatable :: work  ! work array for LAPACK
 integer, dimension(:),allocatable :: ipvt   ! pivot indices
 integer info,job
