@@ -73,7 +73,7 @@ real(8), external :: rho,drhodx,drhody,gx,gy   !
 real(8), external :: dudxth,dudyth,dvdxth,dvdyth,phith
 real(8) V_diff,P_diff                          !
 real(8) tol                                    !
-real(8) L2_err_u,L2_err_v,L2_err_p,L2_err_vel  !
+real(8) L2_err_u,L2_err_v,L2_err_p             !
 real(8) L1_err_u,L1_err_v,L1_err_p             !
 real(8) rhoq,drhodyq,drhodxq                   !
 real(8) hx,hy                                  !
@@ -85,7 +85,7 @@ real(8) dudy_L2,dvdy_L1,dvdy_L2,phi_L1,phi_L2  !
                                                !
 logical, dimension(:), allocatable :: bc_fix   ! prescribed b.c. array
 character(len=1) cbench                        ! benchmark as a string for filenames
-real(8),dimension(4) :: benchmark_list         ! list of benchmarks to loop over
+integer,dimension(4) :: benchmark_list         ! list of benchmarks to loop over
 character(len=2) c_nnx                         ! character form of nnx
 
                                                !
@@ -118,7 +118,7 @@ open(unit=888,file='OUT/errors_spacing_'//cbench//'.dat',status='replace')
 open(unit=999,file='OUT/errors_spacing_strain_'//cbench//'.dat',status='replace')
 
 
-do nnx= 8,32,8 !16,40,4
+do nnx= 8,64,8 !16,40,4
 call int_to_char(c_nnx,2,nnx)
 
 nny=nnx
@@ -617,16 +617,16 @@ dvdx_elemental=dvdx_elemental/hx/hy
 dudy_elemental=dudy_elemental/hx/hy
 dvdy_elemental=dvdy_elemental/hx/hy
 
-iel=0
-do j=1,nely
-do i=1,nelx
-   iel=iel+1
-   write(1070,*) iel,dudx_elemental(iel)
-   write(1071,*) iel,dvdx_elemental(iel)
-   write(1072,*) iel,dudy_elemental(iel)
-   write(1073,*) iel,dvdy_elemental(iel)
-end do 
-end do 
+! iel=0
+! do j=1,nely
+! do i=1,nelx
+!    iel=iel+1
+!    write(1070,*) iel,dudx_elemental(iel)
+!    write(1071,*) iel,dvdx_elemental(iel)
+!    write(1072,*) iel,dudy_elemental(iel)
+!    write(1073,*) iel,dvdy_elemental(iel)
+! end do 
+! end do 
 
 call elemental_to_nodal(dudx_elemental,dudx_nodal,icon,nel,np)
 call elemental_to_nodal(dvdx_elemental,dvdx_nodal,icon,nel,np)

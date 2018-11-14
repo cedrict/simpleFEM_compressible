@@ -1,5 +1,5 @@
-#This script plots the norms for the 4 benchmarks
-# featured in this version of simplefem
+#This script plots the L1 and L2 norms of velocity and pressure
+#for the 4 benchmarks featured in this version of simplefem
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -66,7 +66,7 @@ ax1.plot(x,np.log(u3L1),"-+",label="Benchmark 3")
 ax1.plot(x,np.log(u4L1),"-+",label="Benchmark 4")
 ax1.plot(x,2*x-2,label="Theoretical Convergence")
 ax1.legend()
-ax1.set_xlabel("log(h)")
+ax1.set_xlabel("$\log_{10}(h)$")
 ax1.set_ylabel("log($||e_u||_1$)")
 
 ax2.plot(x,np.log(v1L1),"-+",label="Benchmark 1")
@@ -75,7 +75,7 @@ ax2.plot(x,np.log(v3L1),"-+",label="Benchmark 3")
 ax2.plot(x,np.log(v4L1),"-+",label="Benchmark 4")
 ax2.plot(x,2*x-3.5,label="Theoretical Convergence")
 ax2.legend()
-ax2.set_xlabel("log(h)")
+ax1.set_xlabel("$\log_{10}(h)$")
 ax2.set_ylabel("log($||e_v||_1$)")
 
 ax3.plot(x,np.log(p1L1),"-+",label="Benchmark 1")
@@ -84,7 +84,7 @@ ax3.plot(x,np.log(p3L1),"-+",label="Benchmark 3")
 ax3.plot(x,np.log(p4L1),"-+",label="Benchmark 4")
 ax3.plot(x,x,label="Theoretical Convergence")
 ax3.legend()
-ax3.set_xlabel("log(h)")
+ax1.set_xlabel("$\log_{10}(h)$")
 ax3.set_ylabel("log($||e_p||_1$)")
 
 ax4.plot(x,np.log(uv1L1),"-+",label="Benchmark 1")
@@ -93,7 +93,7 @@ ax4.plot(x,np.log(uv3L1),"-+",label="Benchmark 3")
 ax4.plot(x,np.log(uv4L1),"-+",label="Benchmark 4")
 ax4.plot(x,2*x-2,label="Theoretical Convergence")
 ax4.legend()
-ax4.set_xlabel("log(h)")
+ax4.set_xlabel("$\log_{10}(h)$")
 ax4.set_ylabel("log($||e_{uv}||_1$)")
 
 f.savefig("L1_norms.pdf")
@@ -111,7 +111,7 @@ ax1.plot(x,np.log(u3L2),"-+",label="Benchmark 3")
 ax1.plot(x,np.log(u4L2),"-+",label="Benchmark 4")
 ax1.plot(x,2*x-2,label="Theoretical Convergence")
 ax1.legend()
-ax1.set_xlabel("log(h)")
+ax1.set_xlabel("$\log_{10}(h)$")
 ax1.set_ylabel("log($||e_u||_2)$")
 
 ax2.plot(x,np.log(v1L2),"-+",label="Benchmark 1")
@@ -120,7 +120,7 @@ ax2.plot(x,np.log(v3L2),"-+",label="Benchmark 3")
 ax2.plot(x,np.log(v4L2),"-+",label="Benchmark 4")
 ax2.plot(x,2*x-3,label="Theoretical Convergence")
 ax2.legend()
-ax2.set_xlabel("log(h)")
+ax2.set_xlabel("$\log_{10}(h)$")
 ax2.set_ylabel("log($||e_v||_2$)")
 
 ax3.plot(x,np.log(p1L2),"-+",label="Benchmark 1")
@@ -129,7 +129,7 @@ ax3.plot(x,np.log(p3L2),"-+",label="Benchmark 3")
 ax3.plot(x,np.log(p4L2),"-+",label="Benchmark 4")
 ax3.plot(x,x,label="Theoretical Convergence")
 ax3.legend()
-ax3.set_xlabel("log(h)")
+ax3.set_xlabel("$\log_{10}(h)$")
 ax3.set_ylabel("log($||e_p||_2$)")
 
 ax4.plot(x,np.log(uv1L2),"-+",label="Benchmark 1")
@@ -138,7 +138,7 @@ ax4.plot(x,np.log(uv3L2),"-+",label="Benchmark 3")
 ax4.plot(x,np.log(uv4L2),"-+",label="Benchmark 4")
 ax4.plot(x,2*x-1.5,label="Theoretical Convergence")
 ax4.legend()
-ax4.set_xlabel("log(h)")
+ax4.set_xlabel("$\log_{10}(h)$")
 ax4.set_ylabel("log($||e_{uv}||_2$)")
 
 f.savefig("L2_norms.pdf")

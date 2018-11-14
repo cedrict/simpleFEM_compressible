@@ -1,3 +1,10 @@
+#Script to carry out regression analysis on the L1 and L2
+#norms of the velocity and pressure against grid spacing
+#for the 4 benchmarks used in this version of simplefem
+
+
+
+
 
 import numpy as np
 import matplotlib.pyplot as plt 
@@ -8,17 +15,15 @@ from scipy import stats
 def clean_data(data,nnx_minimum):
     #Removes data for nnx < nnx_minimum
     #To allow regression only on data
-    #where rate has converged
-
+    #on larger values of nnx
     while True:
         if (1/data[0,0] < nnx_minimum+1):
             data = np.delete(data,0,0)
         else:
             break
-nnx_minimum=0
+nnx_minimum=32
 
 data1=np.loadtxt("OUT/errors_spacing_1.dat")
-print(data1)
 clean_data(data1,nnx_minimum)
 u1L2 = data1[:,1]
 v1L2 = data1[:,2]
@@ -74,13 +79,12 @@ uv5L2 = np.sqrt(u5L2**2+v5L2**2)
 
 
 nnx = data1[:,0]
-h=1/nnx
-x=np.log(h)
+h=nnx
 def get_regression(h,y):
     y=np.abs(y)
     x=np.abs(h)
     #return np.linalg.lstsq(np.vstack([np.log(h), np.ones(len(np.log(h)))]).T,np.log(y))[0][0]
-    return -stats.linregress(np.log(x),np.log(y))[0]
+    return stats.linregress(np.log(x),np.log(y))[0]
 
 r_u1=['r_{u1}']
 r_u1.append(get_regression(h,u1L1))
