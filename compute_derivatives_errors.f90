@@ -67,7 +67,6 @@ do iel=1,nel
          dudyq=dudyq+N(k)*dudy_nodal(icon(k,iel))
          dvdxq=dvdxq+N(k)*dvdx_nodal(icon(k,iel))
          dvdyq=dvdyq+N(k)*dvdy_nodal(icon(k,iel))
-
       end do
 
       dudx_L1 = dudx_L1 + abs(dudxq-dudxth(xq,yq,ibench))   *jcob*wq

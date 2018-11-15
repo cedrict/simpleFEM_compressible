@@ -73,7 +73,7 @@ real(8), external :: rho,drhodx,drhody,gx,gy   !
 real(8), external :: dudxth,dudyth,dvdxth,dvdyth,phith
 real(8) V_diff,P_diff                          !
 real(8) tol                                    !
-real(8) L2_err_u,L2_err_v,L2_err_p             !
+real(8) L2_err_u,L2_err_v,L2_err_p,L2_err_vel  !
 real(8) L1_err_u,L1_err_v,L1_err_p             !
 real(8) rhoq,drhodyq,drhodxq                   !
 real(8) hx,hy                                  !
@@ -114,12 +114,13 @@ call int_to_char(cbench,1,ibench_loop)
 !==============================================!
 
 
-open(unit=888,file='OUT/errors_spacing_'//cbench//'.dat',status='replace')
-open(unit=999,file='OUT/errors_spacing_strain_'//cbench//'.dat',status='replace')
+open(unit=888,file='OUT/discretisation_errors_'//cbench//'.dat',status='replace')
+open(unit=999,file='OUT/discretisation_errors_derivatives_'//cbench//'.dat',status='replace')
 
 
 do nnx= 8,64,8 !16,40,4
 call int_to_char(c_nnx,2,nnx)
+
 
 nny=nnx
 
@@ -628,6 +629,7 @@ dvdy_elemental=dvdy_elemental/hx/hy
 ! end do 
 ! end do 
 
+
 call elemental_to_nodal(dudx_elemental,dudx_nodal,icon,nel,np)
 call elemental_to_nodal(dvdx_elemental,dvdx_nodal,icon,nel,np)
 call elemental_to_nodal(dudy_elemental,dudy_nodal,icon,nel,np)
@@ -765,7 +767,9 @@ close(123)
 
 call compute_errors(nel,np,x,y,u,v,Psol,icon,ibench,L2_err_u,L2_err_v,L2_err_p,L1_err_u,L1_err_v,L1_err_p)
 
-write(888,*) hx,L2_err_u,L2_err_v,L2_err_p,&
+L2_err_vel=sqrt(L2_err_u**2 + L2_err_v**2)
+
+write(888,*) hx,L2_err_vel,L2_err_p,&
                 L1_err_u,L1_err_v,L1_err_p ; call flush(888)
 
 call compute_derivatives_errors(nel,np,x,y,dudx_nodal,dvdx_nodal,dudy_nodal,dvdy_nodal,phi_nodal,&
@@ -778,7 +782,6 @@ write(999,'(11es16.5)') hx,dudx_L1,dudx_L2,dvdx_L1,dvdx_L2,&
                 phi_L1,phi_L2 ; call flush(999)
 
 !===================================!
-
 !===================================!
 
 call output_for_paraview (np,nel,x,y,u,v,Psol,icon,ibench,phi_nodal,density_nodal,Rv,Rp,dudx_nodal,dvdy_nodal,cbench,c_nnx)
