@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 
 #Load all the data needed
-data1=np.loadtxt("OUT/errors_spacing_1.dat")
+data1=np.loadtxt("OUT/discretisation_errors_1.dat")
 u1L2 = data1[:,1]
 v1L2 = data1[:,2]
 p1L2 = data1[:,3]
@@ -17,7 +17,7 @@ uv1L1 = np.sqrt(u1L1**2+v1L1**2)
 uv1L2 = np.sqrt(u1L2**2+v1L2**2)
 
 
-data2=np.loadtxt("OUT/errors_spacing_2.dat")
+data2=np.loadtxt("OUT/discretisation_errors_2.dat")
 u2L2 = data2[:,1]
 v2L2 = data2[:,2]
 p2L2 = data2[:,3]
@@ -28,7 +28,7 @@ uv2L1 = np.sqrt(u2L1**2+v2L1**2)
 uv2L2 = np.sqrt(u2L2**2+v2L2**2)
 
 
-data3=np.loadtxt("OUT/errors_spacing_3.dat")
+data3=np.loadtxt("OUT/discretisation_errors_3.dat")
 u3L2 = data3[:,1]
 v3L2 = data3[:,2]
 p3L2 = data3[:,3]
@@ -38,7 +38,7 @@ p3L1 = np.abs(data3[:,6])
 uv3L1 = np.sqrt(u3L1**2+v3L1**2)
 uv3L2 = np.sqrt(u3L2**2+v3L2**2)
 
-data5=np.loadtxt("OUT/errors_spacing_4.dat")
+data5=np.loadtxt("OUT/discretisation_errors_4.dat")
 u4L2 = data5[:,1]
 v4L2 = data5[:,2]
 p4L2 = data5[:,3]

@@ -23,7 +23,7 @@ def clean_data(data,nnx_minimum):
             break
 nnx_minimum=32
 
-data1=np.loadtxt("OUT/errors_spacing_1.dat")
+data1=np.loadtxt("OUT/discretisation_errors_1.dat")
 clean_data(data1,nnx_minimum)
 u1L2 = data1[:,1]
 v1L2 = data1[:,2]
@@ -36,7 +36,7 @@ uv1L1 = np.sqrt(u1L1**2+v1L1**2)
 uv1L2 = np.sqrt(u1L2**2+v1L2**2)
 
 
-data2=np.loadtxt("OUT/errors_spacing_2.dat")
+data2=np.loadtxt("OUT/discretisation_errors_2.dat")
 clean_data(data2,nnx_minimum)
 u2L2 = data2[:,1]
 v2L2 = data2[:,2]
@@ -50,7 +50,7 @@ uv2L2 = np.sqrt(u2L2**2+v2L2**2)
 
 
 
-data3=np.loadtxt("OUT/errors_spacing_3.dat")
+data3=np.loadtxt("OUT/discretisation_errors_3.dat")
 clean_data(data3,nnx_minimum)
 u3L2 = data3[:,1]
 v3L2 = data3[:,2]
@@ -64,7 +64,7 @@ uv3L2 = np.sqrt(u3L2**2+v3L2**2)
 
 
 
-data5=np.loadtxt("OUT/errors_spacing_4.dat")
+data5=np.loadtxt("OUT/discretisation_errors_4.dat")
 clean_data(data5,nnx_minimum)
 u5L2 = data5[:,1]
 v5L2 = data5[:,2]
