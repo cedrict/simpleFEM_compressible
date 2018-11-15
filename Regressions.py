@@ -152,9 +152,9 @@ file.write(' & Benchmark 1 & Benchmark 2 & Benchmark 3 & Benchmark 5 \\\ \hline 
 for sublist in ratesArray:
     for i in range(len(sublist)):
         if (i==0):
-            file.write('$' + str(sublist[i]) + '$')
+            file.write('$'+sublist[i]+'$')
         else:
-            file.write(str(sublist[i]))
+            file.write('{:1.4f}'.format(sublist[i]))
         if(i < len(sublist)-1):
             file.write(" & ")
     file.write(' \\\ \hline \n')
