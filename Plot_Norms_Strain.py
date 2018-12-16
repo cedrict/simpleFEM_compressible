@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-data1 = np.loadtxt("OUT/discretisation_errors_strain_1.dat")
+data1 = np.loadtxt("OUT/discretisation_errors_derivatives_1.dat")
 h = data1[:,0]
 dxu_L1_1 = data1[:,1]
 dxu_L2_1 = data1[:,2]
@@ -22,7 +22,7 @@ phi_L2_1 = data1[:,10]
 
 
 
-data2 = np.loadtxt("OUT/discretisation_errors_strain_2.dat")
+data2 = np.loadtxt("OUT/discretisation_errors_derivatives_2.dat")
 
 dxu_L1_2 = data2[:,1]
 dxu_L2_2 = data2[:,2]
@@ -38,7 +38,7 @@ phi_L2_2 = data2[:,10]
 
 
 
-data3 = np.loadtxt("OUT/discretisation_errors_strain_3.dat")
+data3 = np.loadtxt("OUT/discretisation_errors_derivatives_3.dat")
 
 dxu_L1_3 = data3[:,1]
 dxu_L2_3 = data3[:,2]
@@ -54,7 +54,7 @@ phi_L2_3 = data3[:,10]
 
 
 
-data5 = np.loadtxt("OUT/discretisation_errors_strain_4.dat")
+data5 = np.loadtxt("OUT/discretisation_errors_derivatives_4.dat")
 
 dxu_L1_5 = data5[:,1]
 dxu_L2_5 = data5[:,2]

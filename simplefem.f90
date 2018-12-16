@@ -118,7 +118,7 @@ open(unit=888,file='OUT/discretisation_errors_'//cbench//'.dat',status='replace'
 open(unit=999,file='OUT/discretisation_errors_derivatives_'//cbench//'.dat',status='replace')
 
 
-do nnx= 8,64,8 !16,40,4
+do nnx= 8,48,8 
 call int_to_char(c_nnx,2,nnx)
 
 

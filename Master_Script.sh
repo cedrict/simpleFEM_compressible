@@ -4,7 +4,9 @@
 
 make
 
-./simplefem 
+mkdir -p OUT
+
+#./simplefem 
 
 python Plot_Norms.py
 
