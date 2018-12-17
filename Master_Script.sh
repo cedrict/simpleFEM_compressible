@@ -6,7 +6,7 @@ make
 
 mkdir -p OUT
 
-#./simplefem 
+./simplefem 
 
 python Plot_Norms.py
 

@@ -118,7 +118,7 @@ open(unit=888,file='OUT/discretisation_errors_'//cbench//'.dat',status='replace'
 open(unit=999,file='OUT/discretisation_errors_derivatives_'//cbench//'.dat',status='replace')
 
 
-do nnx= 8,48,8 
+do nnx= 8,64,8 
 call int_to_char(c_nnx,2,nnx)
 
 
@@ -769,7 +769,11 @@ call compute_errors(nel,np,x,y,u,v,Psol,icon,ibench,L2_err_u,L2_err_v,L2_err_p,L
 
 L2_err_vel=sqrt(L2_err_u**2 + L2_err_v**2)
 
-write(888,*) hx,L2_err_vel,L2_err_p,&
+! write(888,*) hx,L2_err_vel,L2_err_p,&
+!                 L1_err_u,L1_err_v,L1_err_p ; call flush(888)
+
+
+write(888,*) hx,L2_err_u,L2_err_v,L2_err_p,&
                 L1_err_u,L1_err_v,L1_err_p ; call flush(888)
 
 call compute_derivatives_errors(nel,np,x,y,dudx_nodal,dvdx_nodal,dudy_nodal,dvdy_nodal,phi_nodal,&
