@@ -22,7 +22,7 @@ integer approach                               ! hel calculation method
 integer niter                                  ! number of iterations 
 integer i1,i2,i,j,k,iel,counter,iq,jq,iter     !
 integer ik,jk,ikk,jkk,m1,m2,k1,k2              !
-integer ibench,solver                          !
+integer ibench,solver,ibench_loop              !
                                                !  
 real(8) Lx,Ly                                  ! size of the numerical domain
 real(8) viscosity                              ! dynamic viscosity $\mu$ of the material
@@ -84,6 +84,10 @@ real(8) dudx_L1,dudx_L2,dvdx_L1,dvdx_L2,dudy_L1!
 real(8) dudy_L2,dvdy_L1,dvdy_L2,phi_L1,phi_L2  !
                                                !
 logical, dimension(:), allocatable :: bc_fix   ! prescribed b.c. array
+character(len=1) cbench                        ! benchmark as a string for filenames
+integer,dimension(4) :: benchmark_list         ! list of benchmarks to loop over
+character(len=2) c_nnx                         ! character form of nnx
+
                                                !
 !==============================================!
 !=====[setup]==================================!
@@ -93,13 +97,31 @@ Lx=1.d0
 Ly=1.d0
 
 !==============================================!
+!========[benchmark loop]======================!
+!==============================================!
+
+
+benchmark_list = [1,2,3,5]
+
+do ibench_loop=1,4
+ibench=benchmark_list(ibench_loop)
+
+write(*,*) "Now running benchmark ", ibench
+call int_to_char(cbench,1,ibench_loop)
+
+!==============================================!
 !======[node number loop]======================!
 !==============================================!
 
-open(unit=888,file='OUT/discretisation_errors.dat',status='replace')
-open(unit=999,file='OUT/discretisation_errors_derivatives.dat',status='replace')
 
-do nnx= 8,48,8 
+open(unit=888,file='OUT/discretisation_errors_'//cbench//'.dat',status='replace')
+open(unit=999,file='OUT/discretisation_errors_derivatives_'//cbench//'.dat',status='replace')
+
+
+do nnx= 8,64,8 
+call int_to_char(c_nnx,2,nnx)
+
+
 nny=nnx
 
 write(*,'(a,i4,a,i4)') 'resolution:',nnx,' X',nny 
@@ -129,7 +151,6 @@ Cmat(3,1)=0.d0       ; Cmat(3,2)=0.d0       ; Cmat(3,3)=1.d0
 ! 4 - Arie van den Berg
 ! 5 - 1D Cartesian Sinusoidal
 
-ibench=1
 select case(ibench)
 case(-1)
 offsetx=0.d0
@@ -161,7 +182,7 @@ solver=2
 approach=2
 
 if (ibench<0) approach=1 ! kill hel :)
-if (ibench<0) niter=1 ! kill hel :)
+if (ibench<0) niter=1 ! no iteration needed for incompressible
 
 !==============================================!
 !===[allocate memory]==========================!
@@ -597,16 +618,17 @@ dvdx_elemental=dvdx_elemental/hx/hy
 dudy_elemental=dudy_elemental/hx/hy
 dvdy_elemental=dvdy_elemental/hx/hy
 
-iel=0
-do j=1,nely
-do i=1,nelx
-   iel=iel+1
-   write(1070,*) iel,dudx_elemental(iel)
-   write(1071,*) iel,dvdx_elemental(iel)
-   write(1072,*) iel,dudy_elemental(iel)
-   write(1073,*) iel,dvdy_elemental(iel)
-end do 
-end do 
+! iel=0
+! do j=1,nely
+! do i=1,nelx
+!    iel=iel+1
+!    write(1070,*) iel,dudx_elemental(iel)
+!    write(1071,*) iel,dvdx_elemental(iel)
+!    write(1072,*) iel,dudy_elemental(iel)
+!    write(1073,*) iel,dvdy_elemental(iel)
+! end do 
+! end do 
+
 
 call elemental_to_nodal(dudx_elemental,dudx_nodal,icon,nel,np)
 call elemental_to_nodal(dvdx_elemental,dvdx_nodal,icon,nel,np)
@@ -664,39 +686,11 @@ do iel=1,nel
       jcbi(2,2)=    jcb(1,1) /jcob
 
       do k=1,m
-         dNdx(k)=jcbi(1,1)*dNdr(k)+jcbi(1,2)*dNds(k)
-         dNdy(k)=jcbi(2,1)*dNdr(k)+jcbi(2,2)*dNds(k)
-      end do
-
-      ! v_el=0.d0
-      ! T_el=0.d0
-      do k=1,m
-
-         ! phi = phi + viscosity*(dudx_nodal(icon(k,iel))**2 + dudx_nodal(icon(k,iel))*(dudx_nodal(icon(k,iel)) + dvdy_nodal(icon(k,iel))))!i=x,j=x
-         ! phi = phi + viscosity*(dvdy_nodal(icon(k,iel))**2 + dvdy_nodal(icon(k,iel))*(dudx_nodal(icon(k,iel)) + dvdy_nodal(icon(k,iel))))!i=y,j=y
-         ! phi = phi + viscosity*0.5*(dvdx_nodal(icon(k,iel))**2 + dvdx_nodal(icon(k,iel))*dudy_nodal(icon(k,iel)))
-         ! phi = phi + viscosity*0.5*(dudy_nodal(icon(k,iel))**2 + dvdx_nodal(icon(k,iel))*dudy_nodal(icon(k,iel)))
-
-         ! phi_elemental(iel) = phi_elemental(iel) + viscosity*(2.d0*dudx_nodal(icon(k,iel)))**2
-         ! phi_elemental(iel) = phi_elemental(iel) + viscosity*2.d0*(dvdx_nodal(icon(k,iel)) + dudy_nodal(icon(k,iel)))**2
-         ! phi_elemental(iel) = phi_elemental(iel) + viscosity*(2.d0*dvdy_nodal(icon(k,iel)))**2
-         ! phi_elemental(iel) = phi_elemental(iel) - viscosity*4.d0/3.d0*(dudx_nodal(icon(k,iel))+dvdy_nodal(icon(k,iel)))**2
-
-         ! phi_elemental(iel) = phi_elemental(iel) + viscosity*4.d0/3.d0*dNdx(k)*u(icon(k,iel))*dNdx(k)*u(icon(k,iel))
-         ! phi_elemental(iel) = phi_elemental(iel) + viscosity*4.d0/3.d0*dNdy(k)*v(icon(k,iel))*dNdy(k)*v(icon(k,iel))
-         ! phi_elemental(iel) = phi_elemental(iel) - viscosity*(dNdx(k)*v(icon(k,iel)) + dNdy(k)*u(icon(k,iel)))**2
-         ! phi_elemental(iel) = phi_elemental(iel) - viscosity*4.d0/3.d0*dNdx(k)*u(icon(k,iel))*dNdy(k)*v(icon(k,iel))
-
-          !phi_elemental(iel) = phi_elemental(iel)*N(k)*wq*jcob
-
-         ! v_el = v_el + v(icon(k,iel))*N(k)
-         ! T_el = t_el + T(icon(k,iel))*N(k)
-
          phi_elemental(iel) = phi_elemental(iel) + N(k)*phi_nodal(icon(k,iel))*wq*jcob/(hx*hy)
       end do
    end do
    end do
-   !phi_elemental(iel) = 0.25*(phi_nodal(icon(1,iel)) + phi_nodal(icon(2,iel)) + phi_nodal(icon(3,iel)) + phi_nodal(icon(4,iel)))
+
 end do
    
 phi_total = sum(phi_elemental)*hx*hy
@@ -751,11 +745,35 @@ close(123)
 !===================================
 !compute L2 norms 
 
+! call compute_errors(nel,np,x,y,u,v,Psol,icon,ibench,L2_err_u,L2_err_v,L2_err_p,L1_err_u,L1_err_v,L1_err_p)
+
+! L2_err_vel=sqrt(L2_err_u**2 + L2_err_v**2)
+
+! write(888,*) hx,L2_err_vel,L2_err_p,&
+!                 L1_err_u,L1_err_v,L1_err_p ; call flush(888)
+
+! call compute_derivatives_errors(nel,np,x,y,dudx_nodal,dvdx_nodal,dudy_nodal,dvdy_nodal,phi_nodal,&
+!                                 icon,ibench,&
+!                                 dudx_L1,dudx_L2,dvdx_L1,dvdx_L2,dudy_L1,dudy_L2,dvdy_L1,dvdy_L2,&
+!                                 phi_L1,phi_L2)
+
+! write(999,'(11es16.5)') hx,dudx_L1,dudx_L2,dvdx_L1,dvdx_L2,&
+!                 dudy_L1,dudy_L2,dvdy_L1,dvdy_L2,&
+!                 phi_L1,phi_L2 ; call flush(999)
+
+
+!===================================
+!compute L2 norms 
+
 call compute_errors(nel,np,x,y,u,v,Psol,icon,ibench,L2_err_u,L2_err_v,L2_err_p,L1_err_u,L1_err_v,L1_err_p)
 
 L2_err_vel=sqrt(L2_err_u**2 + L2_err_v**2)
 
-write(888,*) hx,L2_err_vel,L2_err_p,&
+! write(888,*) hx,L2_err_vel,L2_err_p,&
+!                 L1_err_u,L1_err_v,L1_err_p ; call flush(888)
+
+
+write(888,*) hx,L2_err_u,L2_err_v,L2_err_p,&
                 L1_err_u,L1_err_v,L1_err_p ; call flush(888)
 
 call compute_derivatives_errors(nel,np,x,y,dudx_nodal,dvdx_nodal,dudy_nodal,dvdy_nodal,phi_nodal,&
@@ -768,8 +786,9 @@ write(999,'(11es16.5)') hx,dudx_L1,dudx_L2,dvdx_L1,dvdx_L2,&
                 phi_L1,phi_L2 ; call flush(999)
 
 !===================================!
+!===================================!
 
-call output_for_paraview (np,nel,x,y,u,v,Psol,icon,ibench,phi_nodal,density_nodal,Rv,Rp,dudx_nodal,dvdy_nodal)
+call output_for_paraview (np,nel,x,y,u,v,Psol,icon,ibench,phi_nodal,density_nodal,Rv,Rp,dudx_nodal,dvdy_nodal,cbench,c_nnx)
 
 !===================================!
 !===========deallocate memory=======!
@@ -809,6 +828,8 @@ end do !end number of nodes loop
 
 close(888)
 close(999)
+
+end do !end benchmark loop
 
 end program
 

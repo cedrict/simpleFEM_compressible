@@ -51,6 +51,7 @@ do iel=1,nel
 
       jcob=jcb(1,1)*jcb(2,2)-jcb(2,1)*jcb(1,2)
 
+
       xq=0.d0
       yq=0.d0
       dudxq=0.d0

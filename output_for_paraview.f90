@@ -1,20 +1,22 @@
-subroutine output_for_paraview (np,nel,x,y,Vx,Vy,p,icon,ibench,phi,density,Rv,Rp,dudx_nodal,dvdy_nodal)
+subroutine output_for_paraview (np,nel,x,y,Vx,Vy,p,icon,ibench,phi,density,Rv,Rp,dudx_nodal,dvdy_nodal,cbench,c_nnx)
 implicit none
 integer np,nel
 real(8), dimension(np)    :: x,y,Vx,Vy,phi,density,dudx_nodal,dvdy_nodal
 real(8), dimension(nel)   :: p,Rp
 integer, dimension(4,nel) :: icon
-real(8), dimension(2*np)    :: Rv 
+real(8), dimension(2*np)  :: Rv 
 real(8) xc,yc
 integer ibench
 integer i,iel
+character(len=1) cbench
+character(len=2) c_nnx
 
-real(8), external :: uth,vth,pth      
+real(8), external :: uth,vth,pth,phith
 real(8), external :: rho,drhodx,drhody,gx,gy  
 real(8), external :: dudxth,dvdyth
 !=======================================
 
-open(unit=123,file='OUT/visu.vtu',status='replace',form='formatted')
+open(unit=123,file='OUT/visu_Benchmark_'//cbench//'nnx_'//c_nnx//'.vtu',status='replace',form='formatted')
 write(123,*) '<VTKFile type="UnstructuredGrid" version="0.1" byte_order="BigEndian">'
 write(123,*) '<UnstructuredGrid>'
 write(123,*) '<Piece NumberOfPoints="',np,'" NumberOfCells="',nel,'">'
@@ -44,6 +46,19 @@ do i=1,np
 write(123,*) phi(i)
 end do
 write(123,*) '</DataArray>'
+
+write(123,*) '<DataArray type="Float32" Name="phi(analytical)" Format="ascii">'
+do i=1,np
+write(123,*) phith(x(i),y(i),ibench)
+end do
+write(123,*) '</DataArray>'
+
+write(123,*) '<DataArray type="Float32" Name="phi differences" Format="ascii">'
+do i=1,np
+write(123,*) phi(i)-phith(x(i),y(i),ibench)
+end do
+write(123,*) '</DataArray>'
+
 
 write(123,*) '<DataArray type="Float32" Name="density" Format="ascii">'
 do i=1,np
